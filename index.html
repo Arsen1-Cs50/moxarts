@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MOXARTS Logo Reveal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            height: 100vh;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding-left: 20px;
+            display: flex;
+            align-items: center;
+            z-index: 500;
+        }
+
+        .logo-container {
+            font-family: "Righteous", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            color: white;
+            font-size: 10rem;
+            font-weight: bold;
+            opacity: 0;
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
+            z-index: 1000;
+            transition:
+                transform 1.8s cubic-bezier(0.77, 0, 0.175, 1),
+                top 1.8s cubic-bezier(0.77, 0, 0.175, 1),
+                left 1.8s cubic-bezier(0.77, 0, 0.175, 1),
+                font-size 1.8s ease,
+                opacity 1.5s ease;
+        }
+
+        .logo-container.revealed {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .logo-container.minimized {
+            top: 5px;
+            left: 5px;
+            transform: translate(0, 0) scale(0.4);
+            font-size: 4rem;
+        }
+
+        .logo-container.glow-pulse {
+            animation: pulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+            }
+
+            to {
+                text-shadow: 0 0 30px rgba(255, 255, 255, 1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="navbar"></div>
+    <div class="logo-container" id="logo">MOXARTS</div>
+
+    <script>
+        window.addEventListener('load', () => {
+            const logo = document.getElementById('logo');
+
+            // Step 1: Reveal
+            setTimeout(() => {
+                logo.classList.add('revealed');
+            }, 100);
+
+            // Step 2: Minimize after reveal
+            setTimeout(() => {
+                logo.classList.add('minimized');
+                logo.classList.add('glow-pulse');
+            }, 2200);
+        });
+    </script>
+
+</body>
+
+</html>
