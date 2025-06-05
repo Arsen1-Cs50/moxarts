@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+]<!DOCTYPE html>
 <html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MOXARTS</title>
+  <title>MOXARTS Gallery</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
 
@@ -16,9 +16,9 @@
 
     body {
       background-color: #000;
-      height: 100vh;
+      font-family: 'Righteous', sans-serif;
+      color: #fff;
       overflow: hidden;
-      font-family: sans-serif;
     }
 
     .navbar {
@@ -36,8 +36,6 @@
 
     .logo-container {
       font-family: "Righteous", sans-serif;
-      font-weight: 400;
-      font-style: normal;
       position: fixed;
       top: 50%;
       left: 50%;
@@ -68,144 +66,297 @@
       font-size: 4rem;
     }
 
-    .logo-container.glow-pulse {
-      animation: pulse 2s ease-in-out infinite alternate;
-    }
-
-    @keyframes pulse {
-      from {
-        text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
-      }
-      to {
-        text-shadow: 0 0 30px rgba(255, 255, 255, 1);
-      }
-    }
-
-    .gallery {
+    .content-container {
+      display: none;
       opacity: 0;
-      transition: opacity 1s ease;
-      padding: 80px 20px 20px;
+      transform: translateY(50px);
+      transition: all 1.5s ease;
+    }
+
+    .content-container.visible {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .gallery-container {
+      max-width: 1200px;
+      margin: 80px auto 50px;
+      padding: 0 20px;
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 20px;
+      overflow-y: auto;
     }
 
-    .gallery.visible {
-      opacity: 1;
-    }
-
-    .gallery img {
+    .art-card {
       width: 100%;
-      height: auto;
+      aspect-ratio: 1 / 1;
+      background-size: cover;
+      background-position: center;
       border-radius: 10px;
       cursor: pointer;
       transition: transform 0.3s ease;
     }
 
-    .gallery img:hover {
+    .art-card:hover {
       transform: scale(1.05);
     }
+    .view-more {
+  display: block;
+  margin: 20px auto;
+  font-size: 1.2rem;
+  background: #000;
+  color: white;
+  padding: 10px 40px;
+  cursor: pointer;
+  border: none;
+  border-radius: 999px;
+  position: relative;
+  font-family: 'Righteous', sans-serif;
+  z-index: 0;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
 
-    .gallery img.featured {
-      grid-column: span 2;
-    }
+.view-more::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
+  background: #000;
+  border-radius: 999px;
+  z-index: 1;
+  transition: background 0.4s ease;
+}
 
-    #fullscreen {
+.view-more::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(to right, #ff1f1f, #ff7b7b);
+  z-index: 0;
+}
+
+.view-more span {
+  position: relative;
+  z-index: 2;
+}
+
+.view-more:hover::before {
+  background: linear-gradient(to right, #ff1f1f, #ff7b7b);
+}
+
+.view-more:hover {
+  box-shadow: 0 0 20px rgba(255, 60, 60, 0.7);
+  color: black;
+}
+
+    .artwork-detail {
       display: none;
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: black;
-      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      background: #000;
+      z-index: 2000;
       justify-content: center;
-      z-index: 999;
-      flex-direction: column;
+      align-items: center;
     }
 
-    #fullscreen img {
-      max-width: 100%;
-      max-height: 100%;
+    .artwork-detail img {
+      max-width: 90vw;
+      max-height: 90vh;
+      object-fit: contain;
     }
 
-    #viewMore {
-      display: block;
-      margin: 20px auto;
-      padding: 10px 20px;
-      cursor: pointer;
-      background-color: white;
-      border: none;
-      border-radius: 5px;
-      font-weight: bold;
+    .hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .gallery {
+        opacity: 1;
+        pointer-events: auto;
+        transition: opacity 1s ease;
+        padding-top: 80px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .gallery img {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .gallery img:hover {
+        transform: scale(1.05);
     }
   </style>
 </head>
 
 <body>
+
+  <div class="gallery hidden" id="gallery">
+    <!-- Dynamically filled with image elements -->
+</div>
+
+<!-- Below gallery div -->
+<button id="viewMore" style="display: block; margin: 20px auto; padding: 10px 20px;">View More</button>
+
+<style>
+    .gallery img.featured {
+        grid-column: span 2;
+        height: auto;
+    }
+</style>
+
+<div id="fullscreen" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; align-items:center; justify-content:center; z-index:999;">
+  <img id="fullImg" style="max-width:100%; max-height:100%;">
+  <div class="logo-container minimized glow-pulse" id="backToGallery" style="cursor:pointer;">MOXARTS</div>
+</div>
+
+
+
   <div class="navbar"></div>
   <div class="logo-container" id="logo">MOXARTS</div>
-  <div class="gallery" id="gallery"></div>
-  <button id="viewMore">View More</button>
-  <div id="fullscreen">
-    <img id="fullImg">
-    <div class="logo-container minimized glow-pulse" id="backToGallery" style="cursor:pointer;">MOXARTS</div>
+
+  <div class="content-container" id="content">
+    <div class="gallery-container" id="gallery"></div>
+    <button class="view-more" id="viewMoreBtn"><span>View More</span></button>
+
+  </div>
+
+  <div class="artwork-detail" id="artDetail" onclick="this.style.display='none';">
+    <img id="artDetailImg" src="" alt="Artwork" />
   </div>
 
   <script>
-    const imageUrls = [
-      // Replace with actual Supabase image URLs
-      'https://via.placeholder.com/600x400',
-      'https://via.placeholder.com/600x401',
-      'https://via.placeholder.com/600x402',
-      'https://via.placeholder.com/600x403',
-      'https://via.placeholder.com/600x404',
-      'https://via.placeholder.com/600x405',
-      'https://via.placeholder.com/600x406'
-    ];
-
     window.addEventListener('load', () => {
       const logo = document.getElementById('logo');
-      const gallery = document.getElementById('gallery');
+      const content = document.getElementById('content');
 
+      // Step 1: Show logo in center
       setTimeout(() => {
         logo.classList.add('revealed');
-      }, 100);
+      }, 200);
 
+      // Step 2: Minimize logo
       setTimeout(() => {
         logo.classList.add('minimized');
-        logo.classList.add('glow-pulse');
-        gallery.classList.add('visible');
-        document.body.style.overflow = 'hidden';
+        document.body.style.overflow = 'auto';
+      }, 2000);
 
-        imageUrls.forEach((url, i) => {
-          const img = document.createElement('img');
-          img.src = url;
-          if (i < 5) img.classList.add('featured');
-          gallery.appendChild(img);
-        });
-      }, 2200);
+      // Step 3: Show content (gallery + button)
+      setTimeout(() => {
+        content.classList.add('visible');
+      }, 3000);
     });
+  </script>
 
-    document.getElementById('viewMore').addEventListener('click', () => {
-      document.body.style.overflow = 'auto';
-    });
+  
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const supabase = createClient(
+      'https://yaqrdtxcaoozzoumauqx.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhcXJkdHhjYW9venpvdW1hdXF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwNTQ1MzYsImV4cCI6MjA2NDYzMDUzNn0.lHTUSNr63vefhIfWyQx5gQHw8bK50zQvWNDvrI1B7xE'
+    );
 
     const gallery = document.getElementById('gallery');
-    const fullscreen = document.getElementById('fullscreen');
-    const fullImg = document.getElementById('fullImg');
-    const backToGallery = document.getElementById('backToGallery');
+    const viewMoreBtn = document.getElementById('viewMoreBtn');
+    const artDetail = document.getElementById('artDetail');
+    const artDetailImg = document.getElementById('artDetailImg');
 
-    gallery.addEventListener('click', e => {
-      if (e.target.tagName === 'IMG') {
-        fullImg.src = e.target.src;
-        fullscreen.style.display = 'flex';
-      }
+    let allArtworks = [];
+    let showingAll = false;
+
+    const loadArtworks = async () => {
+  try {
+    console.log("Attempting to fetch artworks...");
+    
+    const { data, error, status } = await supabase
+      .from('artworks')
+      .select('*')
+      .eq('is_visible', true)
+      .order('created_at', { ascending: false });
+
+    console.log("Supabase response:", { status, data, error });
+
+    if (error) {
+      console.error("Detailed Supabase error:", {
+        message: error.message,
+        code: error.code,
+        details: error.details
+      });
+      throw error;
+    }
+
+    if (!data || data.length === 0) {
+      console.warn("No artworks found - check your data and filters");
+      gallery.innerHTML = '<p style="color:white;grid-column:1/-1;text-align:center">No artworks available</p>';
+      return;
+    }
+
+    allArtworks = data;
+    renderArtworks(false);
+    
+  } catch (err) {
+    console.error("Failed to load artworks:", err);
+    gallery.innerHTML = `
+      <div style="color:white;grid-column:1/-1;text-align:center">
+        <p>Failed to load artworks</p>
+        <small>${err.message}</small>
+      </div>
+    `;
+  }
+};
+
+setTimeout(() => {
+    const gallery = document.getElementById('gallery');
+    gallery.classList.remove('hidden');
+    document.body.style.overflow = 'hidden'; // lock scroll initially
+}, 2500);
+
+    const renderArtworks = (showAll) => {
+      gallery.innerHTML = '';
+      const artworksToShow = showAll ? allArtworks : allArtworks.slice(0, 5);
+      artworksToShow.forEach(art => {
+        const card = document.createElement('div');
+        card.className = 'art-card';
+        card.style.backgroundImage = `url(${art.default_image})`;
+        card.addEventListener('mouseover', () => card.style.backgroundImage = `url(${art.hover_image})`);
+        card.addEventListener('mouseout', () => card.style.backgroundImage = `url(${art.default_image})`);
+        card.addEventListener('click', () => {
+          artDetail.style.display = 'flex';
+          artDetailImg.src = art.hover_image;
+        });
+        gallery.appendChild(card);
+      });
+    };
+
+    
+
+    viewMoreBtn.addEventListener('click', () => {
+      showingAll = !showingAll;
+      viewMoreBtn.textContent = showingAll ? 'Show Less' : 'View More';
+      renderArtworks(showingAll);
     });
 
-    backToGallery.addEventListener('click', () => {
-      fullscreen.style.display = 'none';
-    });
+    loadArtworks();
   </script>
 </body>
 
