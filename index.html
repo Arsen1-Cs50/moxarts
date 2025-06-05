@@ -97,6 +97,9 @@
     }
 
     .art-card {
+       perspective: 1000px; /* Required for 3D effect */
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease, box-shadow 0.4s ease;
       width: 100%;
       aspect-ratio: 4 / 3;
       background-size: cover;
@@ -107,6 +110,8 @@
     }
 
     .art-card:hover {
+       transform: rotateX(10deg); /* Tilts backward */
+  box-shadow: 0 15px 30px rgba(255, 0, 0, 0.3);
       transform: scale(1.05);
     }
     #viewMoreBtn {
@@ -246,8 +251,13 @@
         const card = document.createElement('div');
         card.className = 'art-card';
         card.style.backgroundImage = `url(${art.default_image})`;
-        card.addEventListener('mouseover', () => card.style.backgroundImage = `url(${art.hover_image})`);
-        card.addEventListener('mouseout', () => card.style.backgroundImage = `url(${art.default_image})`);
+        card.addEventListener('mouseenter', () => {
+  card.style.backgroundImage = `url(${art.hover_image})`;
+});
+card.addEventListener('mouseleave', () => {
+  card.style.backgroundImage = `url(${art.default_image})`;
+});
+
         card.addEventListener('click', () => {
           artDetail.style.display = 'flex';
           artDetailImg.src = art.hover_image;
