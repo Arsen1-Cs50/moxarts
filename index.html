@@ -109,22 +109,25 @@
     .art-card:hover {
       transform: scale(1.05);
     }
+#viewMoreBtn {
+  font-family: 'Righteous', sans-serif;
+  background: transparent;
+  padding: 12px 28px;
+  font-size: 1rem;
+  color: white;
+  border-radius: 9999px;
+  border: 2px solid;
+  border-image: linear-gradient(90deg, #ff0000, #ff6666) 1;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+}
 
-    #viewMoreBtn {
-      background: linear-gradient(90deg, red, orange);
-      border: none;
-      color: white;
-      padding: 12px 28px;
-      font-size: 1rem;
-      border-radius: 9999px;
-      cursor: pointer;
-      box-shadow: 0 0 15px rgba(255, 100, 100, 0.6);
-      transition: transform 0.3s ease;
-    }
-
-    #viewMoreBtn:hover {
-      transform: scale(1.1);
-    }
+#viewMoreBtn:hover {
+  background: linear-gradient(90deg, #ff0000, #ff6666);
+  color: white;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 0.7);
+}
 
     #artDetail {
       display: none;
