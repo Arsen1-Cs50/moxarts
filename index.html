@@ -96,24 +96,55 @@
       margin-bottom: 40px;
     }
 
-    .art-card {
-       perspective: 1000px; /* Required for 3D effect */
-  transform-style: preserve-3d;
-  transition: transform 0.5s ease, box-shadow 0.4s ease;
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      background-size: cover;
-      background-position: center;
-      border-radius: 16px;
-      cursor: pointer;
-      transition: transform 0.3s ease;
-    }
+  .art-card {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  perspective: 1000px;
+  border-radius: 16px;
+  overflow: hidden;
+}
 
-    .art-card:hover {
-       transform: rotateX(10deg); /* Tilts backward */
-  box-shadow: 0 15px 30px rgba(255, 0, 0, 0.3);
-      transform: scale(1.05);
-    }
+.art-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+.art-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* ensures full image is visible */
+  transition: transform 0.5s ease, opacity 0.5s ease;
+  border-radius: 16px;
+}
+
+/* Default image tilts back */
+.art-card:hover .art-inner {
+  transform: rotateX(10deg);
+}
+
+/* Hover image pops in */
+.hover-img {
+  opacity: 0;
+  transform: scale(0.9) translateZ(20px);
+  z-index: 2;
+}
+
+.art-card:hover .hover-img {
+  opacity: 1;
+  transform: scale(1) translateZ(40px);
+}
+
+/* Default image stays behind */
+.default-img {
+  z-index: 1;
+}
+
+    
     #viewMoreBtn {
   font-family: 'Righteous', sans-serif;
   position: relative;
@@ -244,27 +275,37 @@
       }
     };
 
-    const renderArtworks = (showAll) => {
-      gallery.innerHTML = '';
-      const artworksToShow = showAll ? allArtworks : allArtworks.slice(0, 5);
-      artworksToShow.forEach(art => {
-        const card = document.createElement('div');
-        card.className = 'art-card';
-        card.style.backgroundImage = `url(${art.default_image})`;
-        card.addEventListener('mouseenter', () => {
-  card.style.backgroundImage = `url(${art.hover_image})`;
-});
-card.addEventListener('mouseleave', () => {
-  card.style.backgroundImage = `url(${art.default_image})`;
-});
+   const renderArtworks = (showAll) => {
+  gallery.innerHTML = '';
+  const artworksToShow = showAll ? allArtworks : allArtworks.slice(0, 5);
 
-        card.addEventListener('click', () => {
-          artDetail.style.display = 'flex';
-          artDetailImg.src = art.hover_image;
-        });
-        gallery.appendChild(card);
-      });
-    };
+  artworksToShow.forEach(art => {
+    const card = document.createElement('div');
+    card.className = 'art-card';
+
+    const inner = document.createElement('div');
+    inner.className = 'art-inner';
+
+    const defaultImg = document.createElement('img');
+    defaultImg.className = 'art-img default-img';
+    defaultImg.src = art.default_image;
+
+    const hoverImg = document.createElement('img');
+    hoverImg.className = 'art-img hover-img';
+    hoverImg.src = art.hover_image;
+
+    inner.appendChild(defaultImg);
+    inner.appendChild(hoverImg);
+    card.appendChild(inner);
+
+    card.addEventListener('click', () => {
+      artDetail.style.display = 'flex';
+      artDetailImg.src = art.hover_image;
+    });
+
+    gallery.appendChild(card);
+  });
+};
 
     viewMoreBtn.addEventListener('click', () => {
       showingAll = !showingAll;
