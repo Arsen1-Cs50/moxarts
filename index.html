@@ -109,9 +109,11 @@
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  transition: transform 0.6s ease;
+  transition: transform 0.8s ease;
 }
-
+#artDetailImg {
+  border-radius: 16px;
+}
 .art-img {
   position: absolute;
   inset: 0;
@@ -124,7 +126,7 @@
 
 /* Default image tilts back */
 .art-card:hover .art-inner {
-  transform: rotateX(10deg);
+  transform: rotateX(30deg);
 }
 
 /* Hover image pops in */
