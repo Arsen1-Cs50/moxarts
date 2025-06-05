@@ -1,10 +1,9 @@
-]<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MOXARTS Gallery</title>
+  <title>MOXARTS Logo Reveal</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
 
@@ -17,7 +16,7 @@
     body {
       background-color: #000;
       font-family: 'Righteous', sans-serif;
-      color: #fff;
+      color: white;
       overflow: hidden;
     }
 
@@ -28,21 +27,15 @@
       width: 100%;
       height: 60px;
       background-color: rgba(0, 0, 0, 0.6);
-      padding-left: 20px;
-      display: flex;
-      align-items: center;
       z-index: 500;
     }
 
     .logo-container {
-      font-family: "Righteous", sans-serif;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.8);
-      color: white;
       font-size: 10rem;
-      font-weight: bold;
       opacity: 0;
       text-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
       z-index: 1000;
@@ -66,35 +59,49 @@
       font-size: 4rem;
     }
 
-    .content-container {
-      display: none;
+    .logo-container.glow-pulse {
+      animation: pulse 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse {
+      from {
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+      }
+
+      to {
+        text-shadow: 0 0 30px rgba(255, 255, 255, 1);
+      }
+    }
+
+    .content {
       opacity: 0;
-      transform: translateY(50px);
-      transition: all 1.5s ease;
+      padding-top: 100px;
+      transition: opacity 1.5s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
-    .content-container.visible {
-      display: block;
+    .content.visible {
       opacity: 1;
-      transform: translateY(0);
     }
 
-    .gallery-container {
-      max-width: 1200px;
-      margin: 80px auto 50px;
-      padding: 0 20px;
+    #gallery {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 20px;
-      overflow-y: auto;
+      width: 90%;
+      max-width: 1000px;
+      margin-bottom: 40px;
     }
 
     .art-card {
       width: 100%;
-      aspect-ratio: 1 / 1;
+      aspect-ratio: 4 / 3;
       background-size: cover;
       background-position: center;
-      border-radius: 10px;
+      border-radius: 16px;
       cursor: pointer;
       transition: transform 0.3s ease;
     }
@@ -102,95 +109,52 @@
     .art-card:hover {
       transform: scale(1.05);
     }
-    .view-more {
-  display: block;
-  margin: 20px auto;
-  font-size: 1.2rem;
-  background: #000;
-  color: white;
-  padding: 10px 40px;
-  cursor: pointer;
-  border: none;
-  border-radius: 999px;
-  position: relative;
-  font-family: 'Righteous', sans-serif;
-  z-index: 0;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
 
-.view-more::before {
-  content: '';
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: calc(100% - 4px);
-  height: calc(100% - 4px);
-  background: #000;
-  border-radius: 999px;
-  z-index: 1;
-  transition: background 0.4s ease;
-}
-
-.view-more::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(to right, #ff1f1f, #ff7b7b);
-  z-index: 0;
-}
-
-.view-more span {
-  position: relative;
-  z-index: 2;
-}
-
-.view-more:hover::before {
-  background: linear-gradient(to right, #ff1f1f, #ff7b7b);
-}
-
-.view-more:hover {
-  box-shadow: 0 0 20px rgba(255, 60, 60, 0.7);
-  color: black;
-}
-
-    .artwork-detail {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: #000;
-      z-index: 2000;
-      justify-content: center;
-      align-items: center;
+    #viewMoreBtn {
+      background: linear-gradient(90deg, red, orange);
+      border: none;
+      color: white;
+      padding: 12px 28px;
+      font-size: 1rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 100, 100, 0.6);
+      transition: transform 0.3s ease;
     }
 
-    .artwork-detail img {
-      max-width: 90vw;
-      max-height: 90vh;
-      object-fit: contain;
+    #viewMoreBtn:hover {
+      transform: scale(1.1);
+    }
+
+    #artDetail {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    #artDetail img {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 16px;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
     }
   </style>
 </head>
 
 <body>
-
   <div class="navbar"></div>
   <div class="logo-container" id="logo">MOXARTS</div>
 
-  <div class="content-container" id="content">
-    <div class="gallery-container" id="gallery"></div>
-    <button class="view-more" id="viewMoreBtn"><span>View More</span></button>
-
+  <div class="content" id="content">
+    <div id="gallery"></div>
+    <button id="viewMoreBtn">View More</button>
   </div>
 
-  <div class="artwork-detail" id="artDetail" onclick="this.style.display='none';">
+  <div id="artDetail">
     <img id="artDetailImg" src="" alt="Artwork" />
   </div>
 
@@ -199,18 +163,14 @@
       const logo = document.getElementById('logo');
       const content = document.getElementById('content');
 
-      // Step 1: Show logo in center
       setTimeout(() => {
         logo.classList.add('revealed');
-      }, 200);
+      }, 100);
 
-      // Step 2: Minimize logo
       setTimeout(() => {
-        logo.classList.add('minimized');
-        document.body.style.overflow = 'auto';
-      }, 2000);
+        logo.classList.add('minimized', 'glow-pulse');
+      }, 2200);
 
-      // Step 3: Show content (gallery + button)
       setTimeout(() => {
         content.classList.add('visible');
       }, 3000);
@@ -234,45 +194,25 @@
     let showingAll = false;
 
     const loadArtworks = async () => {
-  try {
-    console.log("Attempting to fetch artworks...");
-    
-    const { data, error, status } = await supabase
-      .from('artworks')
-      .select('*')
-      .eq('is_visible', true)
-      .order('created_at', { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from('artworks')
+          .select('*')
+          .eq('is_visible', true)
+          .order('created_at', { ascending: false });
 
-    console.log("Supabase response:", { status, data, error });
+        if (error) throw error;
+        if (!data || data.length === 0) {
+          gallery.innerHTML = '<p style="color:white;text-align:center">No artworks available</p>';
+          return;
+        }
 
-    if (error) {
-      console.error("Detailed Supabase error:", {
-        message: error.message,
-        code: error.code,
-        details: error.details
-      });
-      throw error;
-    }
-
-    if (!data || data.length === 0) {
-      console.warn("No artworks found - check your data and filters");
-      gallery.innerHTML = '<p style="color:white;grid-column:1/-1;text-align:center">No artworks available</p>';
-      return;
-    }
-
-    allArtworks = data;
-    renderArtworks(false);
-    
-  } catch (err) {
-    console.error("Failed to load artworks:", err);
-    gallery.innerHTML = `
-      <div style="color:white;grid-column:1/-1;text-align:center">
-        <p>Failed to load artworks</p>
-        <small>${err.message}</small>
-      </div>
-    `;
-  }
-};
+        allArtworks = data;
+        renderArtworks(false);
+      } catch (err) {
+        gallery.innerHTML = `<p style="color:white;text-align:center">Failed to load artworks<br><small>${err.message}</small></p>`;
+      }
+    };
 
     const renderArtworks = (showAll) => {
       gallery.innerHTML = '';
@@ -300,5 +240,4 @@
     loadArtworks();
   </script>
 </body>
-
 </html>
