@@ -1,332 +1,913 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MOXARTS Logo Reveal</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MOXARTS</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Righteous&display=swap');
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background-color: #000;
-      font-family: 'Righteous', sans-serif;
-      color: white;
-      overflow: hidden;
-    }
-
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 60px;
-      background-color: rgba(0, 0, 0, 0.6);
-      z-index: 500;
-    }
-
-    .logo-container {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(0.8);
-      font-size: 10rem;
-      opacity: 0;
-      text-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
-      z-index: 1000;
-      transition:
-        transform 1.8s cubic-bezier(0.77, 0, 0.175, 1),
-        top 1.8s cubic-bezier(0.77, 0, 0.175, 1),
-        left 1.8s cubic-bezier(0.77, 0, 0.175, 1),
-        font-size 1.8s ease,
-        opacity 1.5s ease;
-    }
-
-    .logo-container.revealed {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-
-    .logo-container.minimized {
-      top: 5px;
-      left: 5px;
-      transform: translate(0, 0) scale(0.4);
-      font-size: 4rem;
-    }
-
-    .logo-container.glow-pulse {
-      animation: pulse 2s ease-in-out infinite alternate;
-    }
-
-    @keyframes pulse {
-      from {
-        text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
-      }
-      to {
-        text-shadow: 0 0 30px rgba(255, 255, 255, 1);
-      }
-    }
-
-    .content {
-      opacity: 0;
-      padding-top: 100px;
-      transition: opacity 1.5s ease;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .content.visible {
-      opacity: 1;
-    }
-
-    #gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 20px;
-      width: 90%;
-      max-width: 1000px;
-      margin-bottom: 40px;
-    }
-
-    .art-card {
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      perspective: 1000px;
-      border-radius: 16px;
-      overflow: visible;
-    }
-
-    .art-inner {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      transition: transform 0.8s ease;
-      border-radius: 16px;
-    }
-
-    .art-inner-clip {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      overflow: hidden;
-      border-radius: 16px;
-      z-index: 1;
-    }
-
-    .default-img,
-    .hover-img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      border-radius: 16px;
-      transition: transform 0.5s ease, opacity 0.5s ease;
-    }
-
-    .default-img {
-      z-index: 1;
-      transform-origin: center;
-    }
-
-    .art-card:hover .default-img {
-      transform: rotateX(25deg);
-    }
-
-    .hover-img {
-      z-index: 2;
-      opacity: 0;
-      transform: scale(0.9) translateZ(0px);
-    }
-
-    .art-card:hover .hover-img {
-      opacity: 1;
-      transform: scale(1) translateZ(40px) translateY(-10px);
-    }
-
-    #viewMoreBtn {
-      font-family: 'Righteous', sans-serif;
-      position: relative;
-      padding: 12px 28px;
-      font-size: 1rem;
-      color: white;
-      border-radius: 9999px;
-      background: transparent;
-      border: 2px solid transparent;
-      background-image: 
-        linear-gradient(black, black),
-        linear-gradient(90deg, #ff0000, #ff6666);
-      background-origin: border-box;
-      background-clip: padding-box, border-box;
-      cursor: pointer;
-      transition: color 0.4s ease;
-      overflow: hidden;
-      z-index: 1;
-    }
-
-    #viewMoreBtn::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, #ff0000, #ff6666);
-      z-index: -1;
-      transition: left 0.4s ease;
-      border-radius: 9999px;
-    }
-
-    #viewMoreBtn:hover {
-      color: white;
-      box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
-    }
-
-    #viewMoreBtn:hover::before {
-      left: 0;
-    }
-
-    #artDetail {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background-color: rgba(0, 0, 0, 0.8);
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-    }
-
-    #artDetail img,
-    #artDetailImg {
-      max-width: 90%;
-      max-height: 90%;
-      border-radius: 16px;
-      box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
-    }
-  </style>
-</head>
-
-<body>
-  <div class="navbar"></div>
-  <div class="logo-container" id="logo">MOXARTS</div>
-
-  <div class="content" id="content">
-    <div id="gallery"></div>
-    <button id="viewMoreBtn">View More</button>
-  </div>
-
-  <div id="artDetail">
-    <img id="artDetailImg" src="" alt="Artwork" />
-  </div>
-
-  <script>
-    window.addEventListener('load', () => {
-      const logo = document.getElementById('logo');
-      const content = document.getElementById('content');
-
-      setTimeout(() => {
-        logo.classList.add('revealed');
-      }, 100);
-
-      setTimeout(() => {
-        logo.classList.add('minimized', 'glow-pulse');
-      }, 2200);
-
-      setTimeout(() => {
-        content.classList.add('visible');
-      }, 3000);
-    });
-  </script>
-
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-    const supabase = createClient(
-      'https://yaqrdtxcaoozzoumauqx.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhcXJkdHhjYW9venpvdW1hdXF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwNTQ1MzYsImV4cCI6MjA2NDYzMDUzNn0.lHTUSNr63vefhIfWyQx5gQHw8bK50zQvWNDvrI1B7xE'
-    );
-
-    const gallery = document.getElementById('gallery');
-    const viewMoreBtn = document.getElementById('viewMoreBtn');
-    const artDetail = document.getElementById('artDetail');
-    const artDetailImg = document.getElementById('artDetailImg');
-
-    let allArtworks = [];
-    let showingAll = false;
-
-    const loadArtworks = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('artworks')
-          .select('*')
-          .eq('is_visible', true)
-          .order('created_at', { ascending: false });
-
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-          gallery.innerHTML = '<p style="color:white;text-align:center">No artworks available</p>';
-          return;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        allArtworks = data;
-        renderArtworks(false);
-      } catch (err) {
-        gallery.innerHTML = `<p style="color:white;text-align:center">Failed to load artworks<br><small>${err.message}</small></p>`;
-      }
-    };
+        body {
+            background-color: #000;
+            font-family: 'Righteous', sans-serif;
+            color: white;
+            overflow: hidden;
+        }
 
-    const renderArtworks = (showAll) => {
-      gallery.innerHTML = '';
-      const artworksToShow = showAll ? allArtworks : allArtworks.slice(0, 5);
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 500;
+        }
 
-      artworksToShow.forEach(art => {
-        const card = document.createElement('div');
-        card.className = 'art-card';
+        .nav-menu {
+            position: fixed;
+            top: 0px;
+            right: 0px;
+            z-index: 4000;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 1s ease, transform 1s ease;
+            pointer-events: auto;
+        }
 
-        const inner = document.createElement('div');
-        inner.className = 'art-inner';
+        .nav-menu.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
 
-        const clip = document.createElement('div');
-        clip.className = 'art-inner-clip';
+        .nav-circle-wrapper {
+            width: 320px;
+            height: 320px;
+            position: relative;
+            overflow: visible;
+            pointer-events: auto;
+        }
 
-        const defaultImg = document.createElement('img');
-        defaultImg.className = 'art-img default-img';
-        defaultImg.src = art.default_image;
+        .nav-circle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff0000, #fdadad);
+            padding: 6px;
+            cursor: pointer;
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            will-change: transform, width, height, border-radius;
+        }
 
-        const hoverImg = document.createElement('img');
-        hoverImg.className = 'art-img hover-img';
-        hoverImg.src = art.hover_image;
+        .nav-circle::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            background-color: black;
+            border-radius: 50%;
+            z-index: -1;
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
 
-        clip.appendChild(defaultImg);
-        clip.appendChild(hoverImg);
-        inner.appendChild(clip);
-        card.appendChild(inner);
+        .nav-circle:hover {
+            width: 300px;
+            height: 300px;
+            border-radius: 0 0 0 100%;
+            top: 10px;
+            right: 10px;
+        }
 
-        card.addEventListener('click', () => {
-          artDetail.style.display = 'flex';
-          artDetailImg.src = art.hover_image;
+        .nav-circle:hover::before {
+            border-radius: 0 0 0 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #ff0000, #ff6666);
+            opacity: 1;
+        }
+
+        .profile-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 100%;
+            object-fit: cover;
+            z-index: 1;
+            transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .glass-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px) brightness(0.7);
+            z-index: 3999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1), visibility 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .nav-circle:hover~.glass-overlay,
+        .nav-circle:hover+* .glass-overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .nav-links {
+            position: absolute;
+            top: 40%;
+            left: 100px;
+            transform: translateY(-50%);
+            width: 180px;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            /* align left */
+            padding: 25px;
+            opacity: 0;
+            transition: opacity 0.4s ease 0.2s;
+            gap: 18px;
+        }
+
+
+        .nav-circle:hover .nav-links {
+            opacity: 1;
+        }
+
+        .nav-circle:hover .profile-img {
+            opacity: 0;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-family: 'Righteous', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            transform: translateX(20px);
+            opacity: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-align: left;
+            /* changed from right */
+            width: 100%;
+            /* fill available width */
+            justify-content: flex-start;
+            /* align content left */
+        }
+
+
+        .nav-circle:hover .nav-link {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .nav-circle:hover .nav-link:nth-child(1) {
+            transition-delay: 0.1s;
+        }
+
+        .nav-circle:hover .nav-link:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+
+        .nav-circle:hover .nav-link:nth-child(3) {
+            transition-delay: 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #ffcccc;
+            transform: translateX(-5px);
+        }
+
+        .nav-icon-img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+
+        .nav-menu.hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transition: opacity 0.3s ease;
+        }
+
+        .logo-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            font-size: 10rem;
+            opacity: 0;
+            text-shadow: 0 0 25px rgba(255, 255, 255, 0.9);
+            z-index: 3000;
+            will-change: transform, top, left, font-size, opacity;
+            transition:
+                transform 2s ease-in-out,
+                top 2s ease-in-out,
+                left 2s ease-in-out,
+                font-size 2s ease,
+                opacity 1.5s ease-in-out;
+        }
+
+        .logo-container.revealed {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .logo-container.minimized {
+            top: 5px;
+            left: 5px;
+            transform: translate(0, 0) scale(0.4);
+            font-size: 4rem;
+        }
+
+        .logo-container.glow-pulse {
+            animation: pulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+            }
+
+            to {
+                text-shadow: 0 0 30px rgba(255, 255, 255, 1);
+            }
+        }
+
+        .content {
+            opacity: 0;
+            padding-top: 100px;
+            transition: opacity 1.5s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 120px;
+        }
+
+        .content.visible {
+            opacity: 1;
+        }
+
+        #gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            margin-bottom: 40px;
+            align-items: flex-start;
+            min-height: 660px;
+            transition: min-height 0.3s ease;
+        }
+
+        .art-card {
+            height: 300px;
+            perspective: 1000px;
+            border-radius: 20px;
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .art-card.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .art-inner {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s ease;
+            border-radius: 16px;
+            background-color: black;
+            overflow: hidden;
+            padding: 0px;
+        }
+
+        .art-inner-clip {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            z-index: 1;
+            background: black;
+        }
+
+        .art-inner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #ff0000, #ff6666, #ff3333, #ff0000);
+            border-radius: 16px;
+            z-index: -1;
+            transition: transform 0.5s ease;
+        }
+
+        .art-card:hover .art-inner::before {
+            transform: rotateX(25deg);
+        }
+
+        .default-img,
+        .hover-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            border-radius: 20px;
+            transition: transform 0.5s ease, opacity 0.5s ease, box-shadow 0.5s ease;
+            background: black;
+        }
+
+        .default-img {
+            z-index: 1;
+            transform-origin: center;
+        }
+
+        .art-card:hover .default-img {
+            transform: rotateX(25deg);
+            box-shadow:
+                inset 0 10px 20px rgba(0, 0, 0, 0.3),
+                inset 0 -10px 20px rgba(0, 0, 0, 0.2),
+                inset 10px 0 20px rgba(0, 0, 0, 0.1),
+                inset -10px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .hover-img {
+            z-index: 2;
+            opacity: 0;
+            transform: scale(0.9) translateZ(0px);
+            border-radius: 20px;
+        }
+
+        .art-card:hover .hover-img {
+            opacity: 1;
+            transform: scale(1) translateZ(40px) translateY(-10px);
+        }
+
+        #viewMoreBtn {
+            font-family: 'Righteous', sans-serif;
+            position: relative;
+            padding: 12px 28px;
+            font-size: 1rem;
+            color: white;
+            border-radius: 9999px;
+            background: transparent;
+            border: 2px solid transparent;
+            background-image:
+                linear-gradient(black, black),
+                linear-gradient(90deg, #ff0000, #ff6666);
+            background-origin: border-box;
+            background-clip: padding-box, border-box;
+            cursor: pointer;
+            transition: color 0.4s ease;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        #viewMoreBtn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff6666);
+            z-index: -1;
+            transition: left 0.4s ease;
+            border-radius: 9999px;
+        }
+
+        #viewMoreBtn:hover {
+            color: white;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+        }
+
+        #viewMoreBtn:hover::before {
+            left: 0;
+        }
+
+        #artDetail {
+            display: none;
+            position: fixed;
+            inset: 0;
+            backdrop-filter: blur(15px) brightness(0.6);
+            background-color: rgba(0, 0, 0, 0.4);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+        }
+
+        #artDetail.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        #artDetail img,
+        #artDetailImg {
+            max-width: 80vw;
+            max-height: 80vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 16px;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+        }
+
+        #artDetailImg {
+            opacity: 0;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .art-card {
+                height: 250px;
+            }
+
+            #gallery {
+                gap: 15px;
+            }
+
+            .nav-circle:hover {
+                width: 280px;
+                height: 280px;
+            }
+
+            .nav-circle-wrapper {
+                width: 280px;
+                height: 280px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .art-card {
+                height: 200px;
+            }
+
+            #gallery {
+                gap: 10px;
+            }
+
+            .nav-circle:hover {
+                width: 200px;
+                height: 200px;
+            }
+
+            .nav-circle-wrapper {
+                width: 200px;
+                height: 200px;
+            }
+        }
+
+        img {
+            pointer-events: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-user-drag: none;
+            /* Works in Safari */
+        }
+
+        .art-inner-clip::after {
+            content: "© MOXARTS";
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        #artDetailImg-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        #artDetailImg-wrapper::after {
+            content: "© MOXARTS";
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.3);
+            pointer-events: none;
+            z-index: 5;
+            font-family: 'Righteous', sans-serif;
+        }
+    </style>
+</head>
+
+<body oncontextmenu="return false;">
+
+    <div class="navbar"></div>
+
+    <!-- Glass overlay for background blur -->
+    <div class="glass-overlay"></div>
+
+    <!-- Navigation Menu -->
+    <div class="nav-menu" id="navMenu">
+        <div class="nav-circle-wrapper">
+            <div class="nav-circle">
+                <img src="jackal.png" alt="Profile" class="profile-img" />
+                <div class="nav-links">
+                    <a href="#" id="aboutLink" class="nav-link">
+
+                        <img src="user.png" class="nav-icon-img" alt="About Icon">
+                        About Me
+                    </a>
+                    <a href="https://linkedin.com/in/yourprofile" target="_blank" class="nav-link">
+                        <img src="linked in.png" class="nav-icon-img" alt="linked in Icon">
+                        LinkedIn
+                    </a>
+                    <a href="https://instagram.com/yourprofile" target="_blank" class="nav-link">
+                        <img src="insta.png" class="nav-icon-img" alt="insta Icon">
+                        Instagram
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="logo-container glow-pulse" id="logo" style="cursor:pointer;">MOXARTS</div>
+
+    <div class="content" id="content">
+        <div id="gallery"></div>
+        <button id="viewMoreBtn">View More</button>
+    </div>
+
+    <div id="artDetail">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+            <div id="artDetailImg-wrapper">
+                <img id="artDetailImg" src="" alt="Artwork" />
+            </div>
+
+            <p id="artTitle" style="color: white; font-size: 1.2rem; font-family: 'Righteous', sans-serif;"></p>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', () => {
+            const logo = document.getElementById('logo');
+            const content = document.getElementById('content');
+            const navMenu = document.getElementById('navMenu');
+
+            setTimeout(() => {
+                logo.classList.add('revealed');
+            }, 100);
+
+            setTimeout(() => {
+                logo.classList.add('minimized', 'glow-pulse');
+            }, 2200);
+
+            setTimeout(() => {
+                content.classList.add('visible');
+                navMenu.classList.add('visible');
+
+
+                const footer = document.getElementById('footer');
+                if (footer) {
+                    footer.style.opacity = '1';
+                }
+            }, 3000);
+        });
+    </script>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        const supabase = createClient(
+            'https://yaqrdtxcaoozzoumauqx.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlhcXJkdHhjYW9venpvdW1hdXF4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkwNTQ1MzYsImV4cCI6MjA2NDYzMDUzNn0.lHTUSNr63vefhIfWyQx5gQHw8bK50zQvWNDvrI1B7xE'
+        );
+
+
+        const gallery = document.getElementById('gallery');
+        const viewMoreBtn = document.getElementById('viewMoreBtn');
+        const artDetail = document.getElementById('artDetail');
+        const artDetailImg = document.getElementById('artDetailImg');
+        const glassOverlay = document.querySelector('.glass-overlay');
+        const navCircle = document.querySelector('.nav-circle');
+
+        navCircle.addEventListener('mouseenter', () => {
+            glassOverlay.style.opacity = '1';
+            glassOverlay.style.visibility = 'visible';
         });
 
-        gallery.appendChild(card);
-      });
-    };
+        navCircle.addEventListener('mouseleave', () => {
+            glassOverlay.style.opacity = '0';
+            glassOverlay.style.visibility = 'hidden';
+        });
 
-    viewMoreBtn.addEventListener('click', () => {
-      showingAll = !showingAll;
-      viewMoreBtn.textContent = showingAll ? 'Show Less' : 'View More';
-      renderArtworks(showingAll);
-    });
+        let allArtworks = [];
+        let showingAll = false;
 
-    loadArtworks();
-  </script>
+        const getImageDimensions = (src) => {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = function () {
+                    resolve({ width: this.width, height: this.height });
+                };
+                img.onerror = function () {
+                    resolve({ width: 300, height: 300 });
+                };
+                img.src = src;
+            });
+        };
+
+        const loadArtworks = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('artworks')
+                    .select('*')
+                    .eq('is_visible', true)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    gallery.innerHTML = '<p style="color:white;text-align:center">No artworks available</p>';
+                    return;
+                }
+
+                allArtworks = data;
+                renderArtworks(false);
+            } catch (err) {
+                gallery.innerHTML = `<p style="color:white;text-align:center">Failed to load artworks<br><small>${err.message}</small></p>`;
+            }
+        };
+
+
+
+        const fadeOutCards = () => {
+            const cards = gallery.querySelectorAll('.art-card');
+            return Promise.all(Array.from(cards).map((card, index) => {
+                return new Promise((resolve) => {
+                    card.classList.remove('visible');
+                    setTimeout(() => {
+                        card.remove();
+                        resolve();
+                    }, 500);
+                });
+            }));
+        };
+
+        const renderArtworks = async (showAll) => {
+            await fadeOutCards();
+
+            const artworksToShow = showAll ? allArtworks : allArtworks.slice(0, 6);
+
+            for (let index = 0; index < artworksToShow.length; index++) {
+                const art = artworksToShow[index];
+
+                const dimensions = await getImageDimensions(art.default_image);
+                const fixedHeight = 300;
+                const aspectRatio = dimensions.width / dimensions.height;
+                const calculatedWidth = Math.round(fixedHeight * aspectRatio);
+                const finalWidth = Math.max(200, Math.min(500, calculatedWidth));
+
+                const card = document.createElement('div');
+                card.className = 'art-card';
+                card.style.width = `${finalWidth}px`;
+
+                const inner = document.createElement('div');
+                inner.className = 'art-inner';
+
+                const clip = document.createElement('div');
+                clip.className = 'art-inner-clip';
+
+                const defaultImg = document.createElement('img');
+                defaultImg.className = 'default-img';
+                defaultImg.src = art.default_image;
+                defaultImg.loading = 'lazy';
+
+                const hoverImg = document.createElement('img');
+                hoverImg.className = 'art-img hover-img';
+                hoverImg.src = art.hover_image;
+                hoverImg.loading = 'lazy';
+
+                clip.appendChild(defaultImg);
+                clip.appendChild(hoverImg);
+                inner.appendChild(clip);
+                card.appendChild(inner);
+
+                card.addEventListener('click', () => {
+                    artDetail.style.display = 'flex';
+                    artDetail.classList.add('visible');
+
+                    artDetailImg.src = art.default_image;
+                    artDetailImg.style.animation = 'none';
+                    void artDetailImg.offsetWidth;
+                    artDetailImg.style.animation = 'fadeIn 0.6s ease forwards';
+
+                    document.getElementById('artTitle').textContent = art.title || "Untitled";
+                    navMenu.classList.add('hidden');
+                });
+
+                gallery.appendChild(card);
+
+                setTimeout(() => {
+                    card.classList.add('visible');
+                }, 100 + (index * 30));
+            }
+        };
+
+        viewMoreBtn.addEventListener('click', () => {
+            showingAll = !showingAll;
+            viewMoreBtn.textContent = showingAll ? 'Show Less' : 'View More';
+            renderArtworks(showingAll);
+            document.body.style.overflowY = showingAll ? 'auto' : 'hidden';
+        });
+
+        const logo = document.getElementById('logo');
+        logo.addEventListener('click', () => {
+            if (artDetail.classList.contains('visible')) {
+                artDetail.classList.remove('visible');
+                setTimeout(() => {
+                    artDetail.style.display = 'none';
+                    artDetailImg.src = '';
+                    document.getElementById('artTitle').textContent = '';
+                    navMenu.classList.remove('hidden');
+                }, 500);
+            }
+        });
+
+        loadArtworks();
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && artDetail.classList.contains('visible')) {
+                logo.click(); // triggers close logic
+            }
+        });
+        const aboutLink = document.getElementById('aboutLink');
+        const aboutModal = document.getElementById('aboutModal');
+        const closeAbout = document.getElementById('closeAbout');
+
+        // Show modal
+        aboutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            aboutModal.style.display = 'flex';
+            setTimeout(() => {
+                aboutModal.style.opacity = '1';
+            }, 50);
+        });
+
+        // Hide modal (close button)
+        closeAbout.addEventListener('click', () => {
+            aboutModal.style.opacity = '0';
+            setTimeout(() => {
+                aboutModal.style.display = 'none';
+            }, 400);
+        });
+
+        // Hide modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && aboutModal.style.display === 'flex') {
+                closeAbout.click();
+            }
+        });
+
+        // Hide modal on outside click
+        aboutModal.addEventListener('click', (e) => {
+            if (e.target === aboutModal) {
+                closeAbout.click();
+            }
+        });
+
+
+
+    </script>
+    <section id="about" style="
+   padding: 80px 20px;
+   color: white;
+   text-align: center;
+   display: none;
+   opacity: 0;
+   transition: opacity 0.6s ease;
+ ">
+        <h2 style="font-size: 2.5rem; margin-bottom: 20px;">About Me</h2>
+        <p style="font-size: 1.2rem; max-width: 800px; margin: auto;">
+            I'm a passionate artist specializing in digital and conceptual art. I love to explore themes of abstraction,
+            emotion, and light. This portfolio showcases my latest creations.
+        </p>
+    </section>
+
+
+    <footer id="footer" style="
+ position: absolute;
+ bottom: 0;
+ width: 100%;
+ text-align: center;
+ padding: 30px 20px;
+ background: #000000;
+ color: white;
+ opacity: 0;
+ transition: opacity 1s ease;
+ font-family: 'Righteous', sans-serif;
+ z-index: 100;
+">
+        <p>© 2025 MOXARTS | <a href="mailto:youremail@example.com" style="color:#ff6666;">Contact Me</a></p>
+    </footer>
+
+    <div id="aboutModal" style="
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  z-index: 4000;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease;
+  opacity: 0;
+">
+        <div style="
+    background: #111;
+    padding: 40px 30px;
+    border-radius: 12px;
+    max-width: 600px;
+    width: 90%;
+    color: white;
+    text-align: center;
+    font-family: 'Righteous', sans-serif;
+    position: relative;
+  ">
+            <button id="closeAbout" style="
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: #ff6666;
+      cursor: pointer;
+    ">&times;</button>
+
+            <h2 style="font-size: 2.2rem; margin-bottom: 20px;">About Me</h2>
+            <p style="font-size: 1.1rem;">
+                Hi, I'm Moksh — a multidisciplinary artist and a Computer Science engineering student with a deep
+                passion for blending the worlds of traditional and digital art.
+                <br><br>
+                My creative journey is rooted in the expressive fluidity of traditional ink illustration, which I
+                harmonize with the vibrant, futuristic aesthetics of digital glow art. This unique fusion allows me to
+                explore emotion, movement, and light in ways that feel both organic and otherworldly.
+                <br><br>
+                While pursuing my CS degree, I constantly find inspiration in the structure of technology — translating
+                logic into linework, and code into color. Through this portfolio, I invite you into a space where craft
+                meets computation, and every piece is a dialogue between the analog and the digital.
+            </p>
+
+        </div>
+    </div>
+
+
+
+
 </body>
+
 </html>
