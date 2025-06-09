@@ -691,137 +691,57 @@
         }
 
         /* Override for non-Android mobile devices to keep original layout */
-        @media only screen and (max-width: 768px) and (not (pointer: coarse)) {
-            #gallery {
-                column-count: initial;
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
 
-            .art-card {
-                height: 250px !important;
-                width: auto !important;
-                break-inside: initial;
-                margin-bottom: initial;
-            }
-
-            .art-inner {
-                height: 250px !important;
-                aspect-ratio: initial;
-            }
-        }
-
-        /* Force Android detection styling */
-        .android-masonry #gallery {
-            column-count: 2;
-            column-gap: 10px;
-            width: 100%;
-            max-width: 100%;
-            padding: 0 10px;
-        }
-
-        .android-masonry .art-card {
-            break-inside: avoid;
-            page-break-inside: avoid;
-            height: auto !important;
-            margin-bottom: 10px;
-            width: 100% !important;
-            perspective: none;
-        }
-
-        .android-masonry .art-inner {
-            height: auto;
-            aspect-ratio: 1/1.5;
-        }
-
-        .android-masonry .art-inner-clip {
-            height: 100%;
-        }
-
-        .android-masonry .default-img,
-        .android-masonry .hover-img {
-            position: relative;
-            height: 100%;
-            width: 100%;
-            object-fit: cover;
-        }
-
-        .android-masonry .art-card:hover .default-img {
-            transform: none;
-            box-shadow: none;
-        }
-
-        .android-masonry .art-card:hover .hover-img {
-            opacity: 0;
-            transform: none;
-        }
-
-        .android-masonry .art-card:hover .art-inner::before {
-            transform: none;
-        }
-
-        @media only screen and (max-width: 768px) {
-            body:not(.android-masonry) #gallery {
-                column-count: initial;
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            body:not(.android-masonry) .art-card {
-                height: 250px !important;
-                width: auto !important;
-            }
-
-            body:not(.android-masonry) .art-inner {
-                height: 250px !important;
-            }
-        }
-
-        @media only screen and (max-width: 480px) {
-  .android-masonry .logo-container {
-    font-size: 5rem !important;
-    transform: translate(-50%, -50%) scale(0.7) !important;
-    transition:
-      transform 2s ease-in-out,
-      top 2s ease-in-out,
-      left 2s ease-in-out,
-      font-size 2s ease,
-      opacity 1.5s ease-in-out;
+        #gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 70%;
+    max-width: 1500px;
+    gap: 1vw;
+    margin-bottom: 40px;
+    align-items: flex-start;
   }
 
-  .android-masonry .logo-container.revealed {
-    transform: translate(-50%, -50%) scale(0.85) !important;
+  /* ✅ Android-specific masonry layout */
+  .android-masonry #gallery {
+    display: block !important;
+    column-count: 2;
+    column-gap: 10px;
+    padding: 0 10px;
+    width: 100%;
+    max-width: 100%;
   }
 
-  .android-masonry .logo-container.minimized {
-    top: 5px !important;
-    left: 5px !important;
-    font-size: 2rem !important;
-    transform: translate(0, 0) scale(0.35) !important;
+  .android-masonry .art-card {
+    display: block;
+    break-inside: avoid;
+    margin-bottom: 10px;
+    width: 100% !important;
+    height: auto !important;
+    perspective: none;
   }
-}
-@media only screen and (max-width: 480px) {
-  .android-masonry .logo-container {
-    transition:
-      transform 3s ease-in-out,
-      top 3s ease-in-out,
-      left 3s ease-in-out,
-      font-size 3s ease,
-      opacity 2.2s ease-in-out;
-  }
-}
-@media only screen and (max-width: 480px) {
-  #aboutModal > div {
-    max-height: 70vh;
-    overflow-y: auto;
-    padding: 30px 20px;
-    font-size: 0.95rem;
-  }
-}
 
+  .android-masonry .art-inner {
+    height: auto;
+    aspect-ratio: 1 / 1.5;
+  }
 
+  .android-masonry .default-img,
+  .android-masonry .hover-img {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .android-masonry .art-card:hover .default-img,
+  .android-masonry .art-card:hover .hover-img,
+  .android-masonry .art-card:hover .art-inner::before {
+    transform: none;
+    opacity: 1;
+    box-shadow: none;
+  }
     </style>
 </head>
 
@@ -994,65 +914,68 @@
             }));
         };
 
-        const renderArtworks = async (showAll) => {
-            await fadeOutCards();
+        const isAndroidDevice = /Android/i.test(navigator.userAgent);
 
-            const artworksToShow = showAll ? allArtworks : allArtworks.slice(0, 6);
+  const renderArtworks = async (showAll) => {
+    await fadeOutCards();
+    const artworksToShow = showAll ? allArtworks : allArtworks.slice(0, 6);
 
-            for (let index = 0; index < artworksToShow.length; index++) {
-                const art = artworksToShow[index];
+    for (let index = 0; index < artworksToShow.length; index++) {
+      const art = artworksToShow[index];
+      const dimensions = await getImageDimensions(art.default_image);
+      const fixedHeight = 300;
+      const aspectRatio = dimensions.width / dimensions.height;
+      const calculatedWidth = Math.round(fixedHeight * aspectRatio);
+      const finalWidth = Math.max(200, Math.min(500, calculatedWidth));
 
-                const dimensions = await getImageDimensions(art.default_image);
-                const fixedHeight = 300;
-                const aspectRatio = dimensions.width / dimensions.height;
-                const calculatedWidth = Math.round(fixedHeight * aspectRatio);
-                const finalWidth = Math.max(200, Math.min(500, calculatedWidth));
+      const card = document.createElement('div');
+      card.className = 'art-card';
 
-                const card = document.createElement('div');
-                card.className = 'art-card';
-                card.style.width = `${finalWidth}px`;
+      if (!isAndroidDevice) {
+        card.style.width = `${finalWidth}px`;
+      }
 
-                const inner = document.createElement('div');
-                inner.className = 'art-inner';
+      const inner = document.createElement('div');
+      inner.className = 'art-inner';
 
-                const clip = document.createElement('div');
-                clip.className = 'art-inner-clip';
+      const clip = document.createElement('div');
+      clip.className = 'art-inner-clip';
 
-                const defaultImg = document.createElement('img');
-                defaultImg.className = 'default-img';
-                defaultImg.src = art.default_image;
-                defaultImg.loading = 'lazy';
+      const defaultImg = document.createElement('img');
+      defaultImg.className = 'default-img';
+      defaultImg.src = art.default_image;
+      defaultImg.loading = 'lazy';
 
-                const hoverImg = document.createElement('img');
-                hoverImg.className = 'art-img hover-img';
-                hoverImg.src = art.hover_image;
-                hoverImg.loading = 'lazy';
+      const hoverImg = document.createElement('img');
+      hoverImg.className = 'art-img hover-img';
+      hoverImg.src = art.hover_image;
+      hoverImg.loading = 'lazy';
 
-                clip.appendChild(defaultImg);
-                clip.appendChild(hoverImg);
-                inner.appendChild(clip);
-                card.appendChild(inner);
+      clip.appendChild(defaultImg);
+      clip.appendChild(hoverImg);
+      inner.appendChild(clip);
+      card.appendChild(inner);
 
-                card.addEventListener('click', () => {
-                    artDetail.style.display = 'flex';
-                    artDetail.classList.add('visible');
+      card.addEventListener('click', () => {
+        artDetail.style.display = 'flex';
+        artDetail.classList.add('visible');
 
-                    artDetailImg.src = art.default_image;
-                    artDetailImg.style.animation = 'none';
-                    void artDetailImg.offsetWidth;
-                    artDetailImg.style.animation = 'fadeIn 0.6s ease forwards';
+        artDetailImg.src = art.default_image;
+        artDetailImg.style.animation = 'none';
+        void artDetailImg.offsetWidth;
+        artDetailImg.style.animation = 'fadeIn 0.6s ease forwards';
 
-                    document.getElementById('artTitle').textContent = art.title || "Untitled";
-                    navMenu.classList.add('hidden');
-                });
+        document.getElementById('artTitle').textContent = art.title || "Untitled";
+        navMenu.classList.add('hidden');
+      });
 
-                gallery.appendChild(card);
+      gallery.appendChild(card);
 
-                setTimeout(() => {
-                    card.classList.add('visible');
-                }, 100 + (index * 30));
-            }
-        };
+      setTimeout(() => {
+        card.classList.add('visible');
+      }, 100 + (index * 30));
+    }
+  };
 
         viewMoreBtn.addEventListener('click', () => {
             showingAll = !showingAll;
